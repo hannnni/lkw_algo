@@ -1,0 +1,63 @@
+
+import java.io.*;
+import java.net.*;
+import java.util.concurrent.*;
+
+
+public class COM_Client {
+	
+	private static ExecutorService executorService = Executors.newSingleThreadExecutor();
+	
+	static String currentDir = new File("test.txt").getAbsolutePath(); 
+	
+	
+	public static void main(String args[]) {
+		serverStart();
+	}
+	
+	public static void serverStart(){
+		try {                 
+		   
+		
+		   ServerSocket server = new ServerSocket(9999);                 
+		   Socket clientSocket = server.accept();                 
+		   ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+		   Object o = in.readObject(); 
+		   
+		   server.close();                 
+		   executorService.shutdown();
+		   clientSocket.close();              
+		   String[] empfangsDaten = o.toString().split(",");
+		   
+		   try
+		   {
+			   BufferedWriter out = new BufferedWriter( new OutputStreamWriter(new FileOutputStream( currentDir )));
+			   out.append(o.toString());out.newLine();
+			   out.close();
+			   
+		   }
+   			catch(Exception e) {System.out.print(e.toString());}
+		   
+		   
+		   if (empfangsDaten[0].equals("9999.0"))
+		   {   
+			   
+		   }
+		   else
+		   {
+			   serverStart();
+		   }
+	   } 
+	   catch (IOException e) {                 
+			   // TODO: Write me                 
+		   throw new UnsupportedOperationException("Not written");             
+	   } 
+	   catch (ClassNotFoundException e) {          
+		   // TODO: Write me             
+		   throw new UnsupportedOperationException("Not written");  
+	   } 
+	}
+}
+
+
+

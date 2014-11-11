@@ -1,0 +1,249 @@
+package vis;
+
+
+/**
+ * COM-JAVA-Bridge --> download jacob.jar library
+ * link jacob.jar in your used libraries
+ * copy jacob-1.16-M1-x86.dll and Interop.VISSIM_COMSERVERLib.dll in C:\windows\system32 folder
+ */
+
+/**
+ * Anregungungen auch unter blog.naver.com/PostView.nhn?blogId=gckcs2&logNo=10069900534
+ */
+
+
+import com.jacob.activeX.*;
+import com.jacob.com.*;
+import java.io.*;
+import java.util.*;
+
+import vis.tcpip;
+
+public class  com 
+{
+    
+	static tcpip senden = new tcpip();
+	
+	//<editor-fold desc="Variablen">
+    private ActiveXComponent vissim;
+    
+    private Dispatch sim; //Simulation
+    private Dispatch net; //Simulationsmodell/Netzmodell
+
+    private Dispatch scs; //Signalcontroller/LSA-Nr.
+    
+    ArrayList<ArrayList<Integer>> scID = new ArrayList<ArrayList<Integer>>(); //Hier befinden sich alle Signalgruppen samt Detektoren drin. dabei ist Position [x][0] immer die LSA-Nummer(ID) und [x][>=1] die Detektoren(ID), die dieser LSA zugeorndet sind
+    
+    Integer[] detection = new Integer[1]; //Hier befinden sich alle Detektionen der aktuellen Minute bzw. am Ende der Minute der auf die Stunde hochgerechnetet Wert. Die Reihenfolge wird aus scID genommen, nur das hier alle Detektoren hintereinander geschrieben werden
+       
+    /**
+     * Einlesen der Detektoren und zugehörigen LSA
+     * Vissim starten und ausgewählte Strecke laden (*.inp-Datei)
+     * Start Vissim and Load simulationmodell (*.inp-file)
+     */
+    public void startVissim(String vissimDatei)  //vissimDatei --> path and name of *.inp file
+    {
+    	/**
+         *  Einlesen der Detektoren und zugehörigen Lichtsignalanlagen aus der *.inp-Datei       
+         */
+    	get_SCDetectorIDs(vissimDatei);
+    	
+		/**
+		 * Initialisieren von VISSIM und Laden des Netzmodells (*.inp-Datei)
+		 */
+    	vissim = new ActiveXComponent("VISSIM.Vissim");
+        Dispatch.call((Dispatch)vissim, "LoadNet", vissimDatei, 0);
+         
+        sim = vissim.getProperty("Simulation").toDispatch();
+        net = vissim.getProperty("Net").toDispatch();     
+        System.out.println("Netz wurde erfolgreich geöffnet");
+        
+        scs = Dispatch.get(net,"SignalControllers").toDispatch();
+        System.out.println("SignalController wurden erfolgreich erstellt");
+    }
+    
+    /**
+     * Auslesen und Setzen der Startzufallszahl - get and set radomseed out of vissim
+     * @return Startzufallszahl
+     */
+    public int getRandomSeed()
+    {
+        int randomSeed = Integer.parseInt(Dispatch.get(sim, "RandomSeed").toString());
+        return randomSeed;
+    }
+    public void setRandomSeed(int randomSeed)
+    {
+        Dispatch.put(sim, "RandomSeed", randomSeed);
+    }
+    
+    /**
+     * Auslesen  und Setzen der Simulationsdauer - get and set period of simulation out of vissim
+     * @return Simulationsdauer
+     */
+    public double getSimPeriod()
+    {
+     	double period = Double.parseDouble(Dispatch.get(sim, "Period").toString());
+        return period;
+    }
+    public void setSimPeriod(double period)
+    {
+        Dispatch.put(sim, "Period", period);
+    }
+    
+    /**
+     * Auslesen  und Setzen der Simulationssekunde - get and set simulationsecound out of vissim
+     * @return Simulationssekunde
+     */
+    public double getSimSecond()
+    {
+        double simSecond = Double.parseDouble(Dispatch.get(sim, "ELAPSEDTIME").toString());
+        return simSecond;
+    }
+    public void setSimSecond(double simSecond)
+    {
+        Dispatch.put(sim, "ELAPSEDTIME", simSecond);
+    }
+    
+    /**
+     * Ermitteln und Setzen der Simulationsschritte pro Simulationssekunde - get and set resolution of simulation out of vissim
+     * @return Schritte pro Sekunde
+     */
+    public double getSimResolution()
+    {
+        double resolution = Double.parseDouble(Dispatch.get(sim, "Resolution").toString());
+        return resolution;
+    }
+    public void setSimResolution(int resolution)
+    {
+         Dispatch.put(sim, "Resolution", resolution);
+    }
+    
+    /**
+     * Simulation läuft die angegbene Anzahl an Zeitschritten - simulation run specified number of time steps
+     */
+	Integer minutenZaehler=0;
+    public void run(int simIntervall)
+    {
+    	for (int i=0; i<simIntervall; i++)
+    	{
+    		minutenZaehler++;
+    		Dispatch.call(sim, "RunSingleStep");
+    	}
+    	
+    	/**
+         * Auslesen der Detektorereignisse aus der Simulation
+         */
+    	getDetection();
+    	
+    	/**
+         * Minütlich werden die Stundenwerte Extrapoliert und die Detektorzählung genullt
+         */	
+    	if (minutenZaehler==60){  		
+    		//Extrapolation auf einen Stundenwert von Fz/min auf Fz/h
+    		for (int i=0; i<detection.length;i++){
+    			detection[i]=detection[i]*60;
+    		}
+    		
+    		//Senden Der Stundenwerte
+    		double simSekunde = getSimSecond();
+    		//senden.sendeDaten(simSekunde, detection, scID);
+    		
+    		//Löschen der aktuellen Detektionen
+    		for (int i=0; i<detection.length;i++){
+    			detection[i]=0;
+    		}
+    		
+    		//Rücksetzen des Minutenzählers
+    		minutenZaehler =0;	
+    	}  	
+    }
+    
+    /**
+     * Auslesen der Detektorereignisse aus der Simulation
+     */
+	public void getDetection()
+    {
+		Integer zaehler =0;
+		for (int i=0; i<scID.size();i++){
+        	
+        	Dispatch sc = Dispatch.call(scs, "GetSignalControllerByNumber",scID.get(i).get(0)).toDispatch();
+           	Dispatch dets = Dispatch.get(sc,"Detectors").toDispatch();
+           	
+        	for (int j=1;j<scID.get(i).size();j++)
+        	{
+        		Dispatch det = Dispatch.call(dets, "GetDetectorByNumber",scID.get(i).get(j)).toDispatch();
+        		Integer detectionTemp = Integer.parseInt(Dispatch.call(det,"AttValue","DETECTION").toString());
+        		
+        		detection[zaehler]= detection[zaehler] + detectionTemp;
+        		zaehler++;
+        	}
+        }   	
+    }
+    
+    
+	/**
+     *  Einlesen der Detektoren und zugehörigen Lichtsignalanlagen aus der *.inp-Datei       
+     */
+    private void get_SCDetectorIDs(String vissimDatei){
+    	try
+    	{
+    	    ArrayList<Integer> scID1 = new ArrayList<Integer>();
+    	    ArrayList<Integer> detectorID1 = new ArrayList<Integer>();
+    		
+    		File fileName = new File(vissimDatei);
+    		FileInputStream fileStream = new FileInputStream(fileName);
+    		BufferedInputStream buffStream = new BufferedInputStream(fileStream);
+    		DataInputStream dataStream = new DataInputStream(buffStream);
+		    
+    		while (dataStream.available() != 0) 
+    		{          	
+    			String currentLine = dataStream.readLine();
+    			if (currentLine.startsWith("DETEKTOR"))
+    			{
+    				int indexStart = currentLine.indexOf("R")+1;
+    				int indexStop = currentLine.indexOf("N")-1;
+    				detectorID1.add(Integer.parseInt(currentLine.substring(indexStart, indexStop).replaceAll(" ","")));
+				
+    				indexStart = currentLine.indexOf("LSA")+3;
+    				indexStop = currentLine.indexOf("FAHRZEUGKLASSEN");
+    				scID1.add(Integer.parseInt(currentLine.substring(indexStart, indexStop).replaceAll(" ","")));
+		 	   }
+    		}
+    		
+    		
+    		detection = new Integer[detectorID1.size()];
+     		//Schreiben aller Detektionen mit 0 zum Initalisieren
+    		for (int i=0; i<detection.length;i++){
+    			detection[i]=0;
+    		}
+    		
+    		
+    		//Sortierung der Daten
+    		
+    		while (detectorID1.size()!=0)
+    		{
+    			ArrayList<Integer> temp = new ArrayList<Integer>();
+    			int tempscID = scID1.get(0);
+    			temp.add(tempscID);
+    			temp.add(detectorID1.get(0));
+    			scID1.remove(0);
+    			detectorID1.remove(0);	
+    			for (int i =0; i<detectorID1.size();i++)
+    			{
+    				if (scID1.get(i).equals(tempscID))
+    				{
+    	    			temp.add(detectorID1.get(i));
+    	    			scID1.remove(i);
+    	    			detectorID1.remove(i);
+    	    			i--;
+    				}
+    			}
+    			scID.add(temp);
+    		}
+    	}
+    	catch (IOException e) {}
+    }
+    
+    
+    
+}

@@ -1,0 +1,22 @@
+package vis;
+
+import java.io.*;
+
+public class start {
+
+	/**
+	 * @param args
+	 */
+	
+	static com vw = new com();
+	
+	public static void main(String[] args) {
+		
+		String currentDir = new File(".").getAbsolutePath(); 
+
+		
+		vw.startVissim(currentDir);
+
+	}
+
+}

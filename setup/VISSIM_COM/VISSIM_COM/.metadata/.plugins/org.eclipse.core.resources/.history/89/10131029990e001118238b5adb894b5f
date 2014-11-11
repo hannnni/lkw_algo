@@ -1,0 +1,75 @@
+package vis;
+
+import java.io.*;
+
+public class start {
+
+	/**
+	 * @param args
+	 */
+	
+	static com vw = new com();
+	
+	String adresseIP = "";
+	int adressePort = 9999;
+	String pfadVissim = "";
+	
+	
+	public static void main(String[] args) {
+		
+		//String configDatei = new File("config.txt").getAbsolutePath(); 
+		
+		try{
+			BufferedReader in = new BufferedReader(new FileReader("config.txt"));
+			String zeile = null;
+			while ((zeile = in.readLine()) != null) 
+			{
+				System.out.println("Gelesene Zeile: " + zeile);
+			}
+		}
+		catch(Exception e) {System.out.print(e.toString());}
+
+		
+		
+		/*
+    	try
+        {
+    		String currentDir = new File("test.txt").getAbsolutePath(); 
+    		BufferedWriter out = new BufferedWriter( new OutputStreamWriter(new FileOutputStream( currentDir )));
+    		out.write(vissimDatei);
+    		out.close(); 
+        }
+   		catch(Exception e) {System.out.print(e.toString());}
+   		*/
+
+		vw.startVissim(vissimDatei);
+		
+		int startzufallszahl = vw.getRandomSeed();
+		double simulationsdauer = vw.getSimPeriod();
+		double simulationssekunde = vw.getSimResolution();
+		
+	
+		try
+        {
+    		String currentDir2 = new File("test2.txt").getAbsolutePath(); 
+    		BufferedWriter out2 = new BufferedWriter( new OutputStreamWriter(new FileOutputStream( currentDir2 )));
+    		out2.write(String.valueOf(startzufallszahl)); out2.newLine();
+    		out2.write(String.valueOf(simulationsdauer)); out2.newLine();
+    		out2.write(String.valueOf(simulationssekunde)); out2.newLine();
+    		out2.close(); 
+        }
+		catch(Exception e) {System.out.print(e.toString());}
+		
+		//for (int i=0; i==3000;i++)
+		//{
+		int i = 0;
+		while (i <= 100) {   
+			vw.run(5);       
+            
+			i++;                         
+        }
+
+		//}
+	}
+
+}

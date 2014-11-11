@@ -1,0 +1,4 @@
+[console_scripts]
+rpyc_registry = rpyc.scretips.rpyc_registry:main
+rpyc_classic = rpyc.scripts.rpyc_classic:main
+

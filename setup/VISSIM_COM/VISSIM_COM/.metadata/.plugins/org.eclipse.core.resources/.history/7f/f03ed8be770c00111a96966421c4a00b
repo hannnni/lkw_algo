@@ -1,0 +1,95 @@
+package vis;
+
+
+/**
+ * COM-JAVA-Bridge --> download jacob.jar library
+ * link jacob.jar in your used libraries
+ * copy jacob-1.16-M1-x86.dll and Interop.VISSIM_COMSERVERLib.dll in C:\windows\system32 folder
+ */
+
+import com.jacob.activeX.*;
+import com.jacob.com.*;
+
+public class  com 
+{
+    //<editor-fold desc="Variablen">
+    private ActiveXComponent vissim;
+    private Dispatch sim;
+    private Dispatch net;
+    public boolean loadNet = false;
+    
+    
+    /**
+     * Vissim starten und ausgewählte Strecke laden (*.inp-Datei)
+     * Start Vissim and Load simulationmodell (*.inp-file)
+     */
+    public void startVissim(String vissimDatei)  //vissimDatei --> path and name of *.inp file
+    {
+        vissim = new ActiveXComponent("VISSIM.Vissim");
+        Dispatch.call((Dispatch)vissim, "LoadNet", vissimDatei, 0);
+        loadNet = true; 
+    }
+    
+    
+    /**
+     * Auslesen und Setzen der Startzufallszahl - get and set radomseed out of vissim
+     * @return Startzufallszahl
+     */
+    public int getRandomSeed()
+    {
+        int randomSeed = 0;
+        sim = vissim.getProperty("Simulation").toDispatch();
+        Object o = Dispatch.get(sim, "RandomSeed");
+        randomSeed = Integer.parseInt(o.toString());
+        return randomSeed;
+    }
+    public void setRandomSeed(int seed)
+    {
+        Object o = seed; 
+        Dispatch.put(sim, "RandomSeed", o);
+    }
+    
+    
+    /**
+     * Auslesen  und Setzen der Simulationsdauer - get and set period of simulation out of vissim
+     * @return Simulationsdauer
+     */
+    public double getSimPeriod()
+    {
+        double period = 0;
+        sim = vissim.getProperty("Simulation").toDispatch();
+        Object o = Dispatch.get(sim, "Period");
+        period = Double.parseDouble(o.toString());
+        return period;
+    }
+    public void setSimPeriod(double period)
+    {
+        Object o = period;
+        Dispatch.put(sim, "Period", o);
+    }
+    
+    
+    /**
+     * Ermitteln der Simulationsschritte pro Simulationssekunde - get resolution of simulation out of vissim
+     * @return Schritte pro Sekunde
+     */
+    public double getSimResolution()
+    {
+        double resolution = 0;
+        sim = vissim.getProperty("Simulation").toDispatch();
+        Object o = Dispatch.get(sim, "Resolution");
+        resolution = Double.parseDouble(o.toString());
+        return resolution;
+    }
+    
+    /**
+     * Simulation läuft die angegbene Anzahl an Zeitschritten - simulation run specified number of time steps
+     */
+    public void run()
+    {
+    	Dispatch.call(sim, "RunSingleStep");
+    }
+    
+    
+    
+}

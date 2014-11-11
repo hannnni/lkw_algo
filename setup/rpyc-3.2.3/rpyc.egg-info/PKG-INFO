@@ -1,0 +1,51 @@
+Metadata-Version: 1.0
+Name: rpyc
+Version: 3.2.3
+Summary: Remote Python Call (RPyC), a transparent and symmetric RPC library
+Home-page: http://rpyc.sourceforge.net
+Author: Tomer Filiba
+Author-email: tomerfiliba@gmail.com
+License: MIT
+Download-URL: http://sourceforge.net/projects/rpyc/files/main/3.2.3
+Description: `RPyC <http://rpyc.sourceforge.net>`_ (pronounced like *are-pie-see*), or *Remote Python Call*,
+        is a **transparent** library for **symmetrical** `remote procedure calls
+        <http://en.wikipedia.org/wiki/Remote_procedure_calls>`_,
+        `clustering <http://en.wikipedia.org/wiki/Clustering>`_, and
+        `distributed-computing <http://en.wikipedia.org/wiki/Distributed_computing>`_.
+        RPyC makes use of `object-proxying <http://en.wikipedia.org/wiki/Proxy_pattern>`_,
+        a technique that employs python's dynamic nature, to overcome the physical boundaries
+        between processes and computers, so that remote objects can be manipulated as if they were local.
+        
+        .. figure:: http://rpyc.sourceforge.net/_static/screenshot.png
+        :align: center
+        
+        A screenshot of a Windows client connecting to a Linux server.
+        
+        Note that text written to the server's ``stdout`` is actually printed on
+        the server's console.
+        
+Platform: POSIX
+Platform: Windows
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.4
+Classifier: Programming Language :: Python :: 2.5
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.0
+Classifier: Programming Language :: Python :: 3.1
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Topic :: Internet
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Object Brokering
+Classifier: Topic :: Software Development :: Testing
+Classifier: Topic :: System :: Clustering
+Classifier: Topic :: System :: Distributed Computing
+Classifier: Topic :: System :: Monitoring
+Classifier: Topic :: System :: Networking
+Classifier: Topic :: System :: Systems Administration

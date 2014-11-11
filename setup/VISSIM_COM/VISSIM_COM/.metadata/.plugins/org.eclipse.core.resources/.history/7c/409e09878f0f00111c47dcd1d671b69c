@@ -1,0 +1,87 @@
+package vis;
+
+import java.io.*;
+import java.net.*;
+import java.util.ArrayList;
+import java.util.concurrent.*;
+
+
+
+public class tcpip {
+	
+	private static ExecutorService executorService = Executors.newSingleThreadExecutor();
+	
+	/**
+	 * Setzen des Ports auf dem die TCP/IP-Verbindung senden soll
+	 */
+	static int adressePort = 9999;
+	static String adresseIP = "127.0.0.1";
+	
+	
+	public void set_adressePort (int port){
+		adressePort =port;
+	}
+	public void set_adresseIP (String ip){
+		adresseIP = ip;
+	}
+	
+	public void start_tcp_ip_connection(){
+
+	}
+	
+	public void ende_tcp_ip_connection(){
+		
+	}
+	
+	
+	public void sendeDaten(Integer[] detection, ArrayList<ArrayList<Integer>> scID)
+	{
+		ArrayList<Double> tempSendeListe = new ArrayList<Double>();
+		
+		int zaehler =0;
+		//tempSendeListe.add(Byte.valueOf(simSekunde.toString()));
+		
+		for (int i=0; i<scID.size();i++){          	
+        	for (int j=1;j<scID.get(i).size();j++)
+        	{
+        		tempSendeListe.add(Double.valueOf(scID.get(i).get(0)));
+        		tempSendeListe.add(Double.valueOf(scID.get(i).get(j)));
+        		tempSendeListe.add(Double.valueOf(detection[zaehler].toString()));
+        		
+        		zaehler++;
+        	}
+		}
+		send_tcp_ip(tempSendeListe);
+	}
+	
+	
+	
+	
+	/**
+	 * Senden der Daten über TCP/IP an einen anderen Rechner
+	 */
+	public void send_tcp_ip(ArrayList<Double> sendeListe)
+	{
+		try {
+			// Start a server to listen for a client         
+			//executorService.submit(new Server());         
+			Thread.sleep(100);         
+			// Send an ArrayList from a client              
+			Socket s = new Socket();       
+			s.connect(new InetSocketAddress(adresseIP,adressePort));       
+			ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());         
+			out.writeObject(sendeListe);         
+			s.close(); 
+        
+	        
+			}
+	      	catch(Exception e) {
+	      		System.out.print("Whoops! It didn't work!\n");
+	      	}
+	}
+	
+	java.net.Socket warteAufAnmeldung(java.net.ServerSocket serverSocket) throws IOException {
+        java.net.Socket socket = serverSocket.accept(); // blockiert, bis sich ein Client angemeldet hat
+        return socket;
+    } 
+}

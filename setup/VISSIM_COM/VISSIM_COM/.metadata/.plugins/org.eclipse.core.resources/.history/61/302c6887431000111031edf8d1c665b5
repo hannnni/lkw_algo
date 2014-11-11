@@ -1,0 +1,12 @@
+package vis;
+
+public class lsa {
+	
+	
+	
+	public void scID_Gr_Status_Change()
+	{
+		
+	}
+
+}

@@ -1,0 +1,32 @@
+package vis;
+
+import java.io.*;
+
+public class start {
+
+	/**
+	 * @param args
+	 */
+	
+	static com vw = new com();
+	
+	public static void main(String[] args) {
+		
+		String vissimDatei = new File("kassel.inp").getAbsolutePath(); 
+		
+    	try
+        {
+    		String currentDir = new File("test.txt").getAbsolutePath(); 
+    		BufferedWriter out = new BufferedWriter( new OutputStreamWriter(new FileOutputStream( currentDir )));
+    		out.write(vissimDatei);
+    		out.close(); 
+        }
+   		catch(Exception e) {System.out.print(e.toString());}
+
+		vw.startVissim(vissimDatei);
+		
+		
+
+	}
+
+}

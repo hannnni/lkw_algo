@@ -1,0 +1,115 @@
+
+import java.io.*;
+import java.net.*;
+import java.util.concurrent.*;
+import java.io.File;
+
+public class COM_Client {
+	
+	private static ExecutorService executorService = Executors.newSingleThreadExecutor();
+	
+	static int adressePort_Detection = 9999;
+	static int adressePort_Status = 9998;
+
+	static String currentDir_Detection = new File("daten_1.txt").getAbsolutePath(); 
+	static String currentDir_Status = new File("daten_2.txt").getAbsolutePath(); 
+	
+	static String currentDir_error = new File("error.txt").getAbsolutePath();
+		
+	public static void main(String args[]) {
+		/**
+		 * Einlesen der Konfigurationsdatei - IP, Port an die gesendet werden soll und Pfad, wo die VISSIM *.inp-Datei zu finden ist
+		 */
+		System.out.println("Start");
+		try{
+			BufferedReader in = new BufferedReader(new FileReader("config_Server.txt"));
+			String zeile = null;
+			while ((zeile = in.readLine()) != null) 
+			{
+				if (zeile.equals("Port zum Empfangen der Detektordaten")) {adressePort_Detection =Integer.parseInt(in.readLine()); }
+				else if (zeile.equals("Port zum Empfangen der Statusdaten der Signalgruppen")) {adressePort_Status =Integer.parseInt(in.readLine()); }
+			}
+		}
+		catch(Exception e) {System.out.print(e.toString());}
+		
+		serverStart_Detection();
+		serverStart_Status();		
+	}
+	
+	private static void serverStart_Status(){
+		try {                 
+
+		   ServerSocket server = new ServerSocket(adressePort_Status);                 
+		   Socket clientSocket = server.accept();                 
+		   ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+		   Object o_Status = in.readObject(); 
+		   
+		   server.close();                 
+		   //executorService.shutdown();
+		   clientSocket.close();              
+		   
+		   schreibeDaten_Status(o_Status);
+	   } 
+	   catch (IOException e) {serverStart_Status();} 
+	   catch (ClassNotFoundException e){serverStart_Status();}        
+	}
+	
+	public static void serverStart_Detection(){
+		try {                 
+
+		   ServerSocket server = new ServerSocket(adressePort_Detection);                 
+		   Socket clientSocket = server.accept();                 
+		   ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+		   Object o_Detection = in.readObject(); 
+		   
+		   server.close();                 
+		   //executorService.shutdown();
+		   clientSocket.close(); 
+		   
+		   schreibeDaten_Detection(o_Detection);
+	   } 
+	   catch (IOException e) {serverStart_Detection();} 
+	   catch (ClassNotFoundException e){serverStart_Detection();}        
+	}
+	
+	
+	private static void schreibeDaten_Detection(Object o_Detection)
+	{
+		/*
+		String[] empfang_Detection = o_Detection.toString().split(",");
+	   
+		
+		if (empfang_Detection[0].equals("9999.0"))
+		   {   
+			   
+		   }
+		   else
+		   {
+			   serverStart();
+		   }
+		*/
+		try
+	   {
+		   BufferedWriter out = new BufferedWriter( new OutputStreamWriter(new FileOutputStream(currentDir_Detection)));
+		   out.append(o_Detection.toString());out.newLine();
+		   out.close();		   
+	   }
+		catch(Exception e) {System.out.print(e.toString());}
+		
+		serverStart_Detection();
+	}
+	
+	private static void schreibeDaten_Status (Object o_Status){
+		try{		   
+			BufferedWriter out = new BufferedWriter( new OutputStreamWriter(new FileOutputStream( currentDir_Status )));
+			out.append(o_Status.toString());out.newLine();
+			out.close();		   
+		   }
+			catch(Exception e) {System.out.print(e.toString());}
+		
+		serverStart_Status();
+	}
+}
+
+
+

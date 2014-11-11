@@ -1,0 +1,21 @@
+Pfad der VISSIM-Datei
+D:\Otto\01_Projekte\DRIVERS\VISSIM_COM\viswork\kassel.inp
+
+IP an die gesendet werden soll
+127.0.0.1
+
+Port auf dem die Detektordaten gesendet werden sollen
+9999
+
+Port auf dem die Statusdaten der Signalgruppe gesendet werden sollen
+9998
+
+Simulationsdauer
+300
+
+Startzufallszahl
+42
+
+Zeitschritte je Sekunde
+5
+

@@ -1,0 +1,17 @@
+package vis;
+
+public class start {
+
+	/**
+	 * @param args
+	 */
+	
+	static com vw = new com();
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		vw.startVissim("c:/kassel.inp");
+
+	}
+
+}

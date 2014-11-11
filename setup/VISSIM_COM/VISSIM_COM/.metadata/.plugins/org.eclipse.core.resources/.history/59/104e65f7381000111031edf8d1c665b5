@@ -1,0 +1,66 @@
+package vis;
+
+import java.io.*;
+import java.net.*;
+import java.util.ArrayList;
+//import java.util.concurrent.*;
+
+public class tcpip {
+
+	//private static ExecutorService executorService = Executors.newSingleThreadExecutor();
+	
+	/**
+	 * Setzen des Ports auf dem die TCP/IP-Verbindung senden soll
+	 */
+	static int adressePort = 9999;
+	static String adresseIP = "127.0.0.1";
+	
+	public void set_adressePort (int port){
+		adressePort =port;
+	}
+	public void set_adresseIP (String ip){
+		adresseIP = ip;
+	}
+	
+	public void sendeDaten(Double simSekunde, Integer[] detection, ArrayList<ArrayList<Integer>> scID_Det)
+	{
+		ArrayList<Double> tempSendeListe = new ArrayList<Double>();
+		
+		tempSendeListe.add(simSekunde);
+		int zaehler =0;
+		//tempSendeListe.add(Byte.valueOf(simSekunde.toString()));
+		
+		for (int i=0; i<scID_Det.size();i++){          	
+        	for (int j=1;j<scID_Det.get(i).size();j++)
+        	{
+        		tempSendeListe.add(Double.valueOf(scID_Det.get(i).get(0)));
+        		tempSendeListe.add(Double.valueOf(scID_Det.get(i).get(j)));
+        		tempSendeListe.add(Double.valueOf(detection[zaehler].toString()));
+        		
+        		zaehler++;
+        	}
+		}
+		send_tcp_ip(tempSendeListe);
+	}
+	
+	/**
+	 * Senden der Daten über TCP/IP an einen anderen Rechner
+	 */
+	public void send_tcp_ip(ArrayList<Double> sendeListe)
+	{
+		try {
+		// Start a server to listen for a client         
+		//executorService.submit(new Server());         
+		//Thread.sleep(100);         
+		// Send an ArrayList from a client              
+		Socket sock = new Socket();       
+		sock.connect(new InetSocketAddress(adresseIP,adressePort));       
+		ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());         
+		out.writeObject(sendeListe);         
+		sock.close(); 
+		}
+	      catch(Exception e) {
+	      	System.out.print("Whoops! It didn't work!\n");
+	    }
+	}
+}

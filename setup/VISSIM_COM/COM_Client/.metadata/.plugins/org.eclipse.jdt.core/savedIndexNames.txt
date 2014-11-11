@@ -1,0 +1,14 @@
+INDEX VERSION 1.126+D:\Otto\01_Projekte\DRIVERS\COM_Client\.metadata\.plugins\org.eclipse.jdt.core
+407208305.index
+1442510170.index
+851513700.index
+64513498.index
+4161156760.index
+2316075811.index
+2074763480.index
+2134985376.index
+2796418548.index
+1539200815.index
+1009594141.index
+3777739620.index
+3867606352.index

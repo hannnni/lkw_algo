@@ -1,0 +1,139 @@
+package vis;
+
+
+/**
+ * COM-JAVA-Bridge --> download jacob.jar library
+ * link jacob.jar in your used libraries
+ * copy jacob-1.16-M1-x86.dll and Interop.VISSIM_COMSERVERLib.dll in C:\windows\system32 folder
+ */
+
+import com.jacob.activeX.*;
+import com.jacob.com.*;
+
+public class  com 
+{
+    //<editor-fold desc="Variablen">
+    private ActiveXComponent vissim;
+    
+    private Dispatch sim;
+    private Dispatch net;
+    
+    private Dispatch scs;
+    private Dispatch det_sc;
+    private Dispatch dets;
+    private Dispatch[] det;
+    private Dispatch delays;
+    
+    
+    
+    
+    public boolean loadNet = false;
+    
+    /**
+     * Vissim starten und ausgewählte Strecke laden (*.inp-Datei)
+     * Start Vissim and Load simulationmodell (*.inp-file)
+     */
+    public void startVissim(String vissimDatei)  //vissimDatei --> path and name of *.inp file
+    {
+        vissim = new ActiveXComponent("VISSIM.Vissim");
+        Dispatch.call((Dispatch)vissim, "LoadNet", vissimDatei, 0);
+        loadNet = true; 
+        
+        sim = vissim.getProperty("Simulation").toDispatch();
+        net = vissim.getProperty("Net").toDispatch();     
+        System.out.println("Netz wurde erfolgreich geöffnet");
+        
+        //scs = Dispatch.get(net,"SignalControllers").toDispatch();
+        System.out.println("SignalController wurden erfolgreich erstellt");
+        
+        //det_sc = Dispatch.call(scs, "GetSignalControllerByNumber",1).toDispatch();
+        System.out.println("Detektoren1 wurden erfolgreich erstellt");
+        
+        //dets = Dispatch.get(det_sc,"Detectors").toDispatch();
+        System.out.println("Detektoren2 wurden erfolgreich erstellt");
+        
+        //delays = Dispatch.get(net,"Delays").toDispatch();
+        System.out.println("Detektoren3 wurden erfolgreich erstellt");
+        
+        
+        
+        
+    }
+    
+    /**
+     * Auslesen und Setzen der Startzufallszahl - get and set radomseed out of vissim
+     * @return Startzufallszahl
+     */
+    public int getRandomSeed()
+    {
+        int randomSeed = 0;
+        Object o = Dispatch.get(sim, "RandomSeed");
+        randomSeed = Integer.parseInt(o.toString());
+        return randomSeed;
+    }
+    public void setRandomSeed(int randomSeed)
+    {
+        Object o = randomSeed; 
+        Dispatch.put(sim, "RandomSeed", o);
+    }
+    
+    /**
+     * Auslesen  und Setzen der Simulationsdauer - get and set period of simulation out of vissim
+     * @return Simulationsdauer
+     */
+    public double getSimPeriod()
+    {
+        double period = 0;
+        Object o = Dispatch.get(sim, "Period");
+        period = Double.parseDouble(o.toString());
+        return period;
+    }
+    public void setSimPeriod(double period)
+    {
+        Object o = period;
+        Dispatch.put(sim, "Period", o);
+    }
+    
+    /**
+     * Ermitteln und Setzen der Simulationsschritte pro Simulationssekunde - get and set resolution of simulation out of vissim
+     * @return Schritte pro Sekunde
+     */
+    public double getSimResolution()
+    {
+        double resolution = 0;
+        Object o = Dispatch.get(sim, "Resolution");
+        resolution = Double.parseDouble(o.toString());
+        return resolution;
+    }
+    public void setSimResolution(int resolution)
+    {
+    	 Object o = resolution;
+         Dispatch.put(sim, "Resolution", o);
+    }
+    
+    /**
+     * Simulation läuft die angegbene Anzahl an Zeitschritten - simulation run specified number of time steps
+     */
+    public void run(int simIntervall)
+    {
+    	for (int i=0; i<simIntervall; i++)
+    	{
+    		Dispatch.call(sim, "RunSingleStep");
+    	}
+    }
+    
+    /**
+     * Auslesen der Detektorereignisse aus der Simulation
+     */
+    public void getDetectors()
+    {
+    	//for (SignalController item: signalControllers) {
+    	//	System.out.println(item);
+    	//}
+
+    	
+    }
+    
+    
+    
+}

@@ -1,0 +1,14 @@
+(lp1
+(lp2
+(lp3
+I1
+aI2
+aaS'smart1'
+p4
+aa(lp5
+(lp6
+I2
+aI2
+aaS'smart2'
+p7
+aa.

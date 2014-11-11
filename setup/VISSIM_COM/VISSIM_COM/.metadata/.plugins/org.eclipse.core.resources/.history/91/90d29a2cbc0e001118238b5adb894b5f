@@ -1,0 +1,104 @@
+package vis;
+
+import java.io.*;
+
+public class start {
+
+	/**
+	 * @param args
+	 */
+	
+	static com vw = new com();
+	static tcpip senden = new tcpip();
+	
+	static String pfadVissim = null;
+	static int simDauer =0;
+	static int simStartzufallszahl=0;
+	static int simIntervall=0;
+	
+	
+	public static void main(String[] args) {
+
+		
+		/**
+		 * Einlesen der Konfigurationsdatei - IP, Port an die gesendet werden soll und Pfad, wo die VISSIM *.inp-Datei zu finden ist
+		 */
+		System.out.println("Start");
+		try{
+			BufferedReader in = new BufferedReader(new FileReader("config.txt"));
+			String zeile = null;
+			while ((zeile = in.readLine()) != null) 
+			{
+				if (zeile.equals("Pfad der VISSIM-Datei")) { pfadVissim = in.readLine(); }
+				else if (zeile.equals("IP an die gesendet werden soll")) { senden.set_adresseIP(in.readLine());}
+				else if (zeile.equals("Port auf dem gesendet werden soll")) {senden.set_adressePort(Integer.parseInt(in.readLine())); }
+				else if (zeile.equals("Simulationsdauer")) {simDauer = Integer.parseInt(in.readLine()); }
+				else if (zeile.equals("Startzufallszahl")) {simStartzufallszahl = Integer.parseInt(in.readLine()); }
+				else if (zeile.equals("Zeitschritte je Sekunde")) {simStartzufallszahl = Integer.parseInt(in.readLine()); }
+			}
+		}
+		catch(Exception e) {System.out.print(e.toString());}
+
+		/**
+		 * Initialisieren von VISSIM inklusive der JAVA-COM-Bridge und Laden des Netzmodells (*.inp-Datei)
+		 */
+		vw.startVissim(pfadVissim);
+		
+		/**
+		 * Setzen der Simulationsparameter
+		 */
+		//vw.setRandomSeed(simStartzufallszahl); //Setzen der Startzufallszahl
+		//System.out.println("Startzufallszahl");
+		//vw.setSimPeriod(simDauer); //Setzen der Simulationsdauer
+		//System.out.println("Simulationsdauer");
+		//vw.setSimResolution(simIntervall); //Setzen Simulationsschritte je Sekunde - Simulationsintervall
+		//System.out.println("Simulationsintervall");
+		
+		/**
+		 * Simulationsdurchlauf und das Auslesen der Detektorwerte
+		 */
+		int i = 0;
+		while (i <= simDauer) {   
+			vw.run(simIntervall); //Simulation läuft eine Sekunde (1s) voran
+            
+			
+			
+			i++;                         
+        }	
+	}
+}
+		
+		
+		
+		/*
+		//String configDatei = new File("config.txt").getAbsolutePath();
+		
+    	try
+        {
+    		String currentDir = new File("test.txt").getAbsolutePath(); 
+    		BufferedWriter out = new BufferedWriter( new OutputStreamWriter(new FileOutputStream( currentDir )));
+    		out.write(vissimDatei);
+    		out.close(); 
+        }
+   		catch(Exception e) {System.out.print(e.toString());}
+   		*/
+		
+		
+		/*
+		int startzufallszahl = vw.getRandomSeed();
+		double simulationsdauer = vw.getSimPeriod();
+		double simulationssekunde = vw.getSimResolution();
+		
+	
+		try
+        {
+    		String currentDir2 = new File("test2.txt").getAbsolutePath(); 
+    		BufferedWriter out2 = new BufferedWriter( new OutputStreamWriter(new FileOutputStream( currentDir2 )));
+    		out2.write(String.valueOf(startzufallszahl)); out2.newLine();
+    		out2.write(String.valueOf(simulationsdauer)); out2.newLine();
+    		out2.write(String.valueOf(simulationssekunde)); out2.newLine();
+    		out2.close(); 
+        }
+		catch(Exception e) {System.out.print(e.toString());}
+		*/
+
